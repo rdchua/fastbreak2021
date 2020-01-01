@@ -29,6 +29,7 @@ import NewsCover from '../../components/NewsCover/NewsCover';
 import moment from 'moment';
 import Modal from 'react-native-modal';
 import NewsFeed from '../../components/NewsFeed/NewsFeed';
+import SkeletonContent from 'react-native-skeleton-content-nonexpo';
 const headerHeight = 176;
 
 export default class Team extends Component {
@@ -70,7 +71,6 @@ export default class Team extends Component {
     const params = navigation.state.params;
     const translateY = params.animatedValue;
     const transform = [{translateY}];
-    reactotron.log('param', params);
     return {
       headerTitle: (
         <Animated.View
@@ -97,7 +97,6 @@ export default class Team extends Component {
   fetchRoster() {
     const {team} = this.state;
     getRoster(team.urlName).then(response => {
-      reactotron.log(response.data);
       this.setState({
         roster: response.data.league.standard.players,
         rosterLoading: false,
@@ -175,10 +174,26 @@ export default class Team extends Component {
 
   renderLeaders = () => {
     if (this.state.leadersLoading) {
-      return <Loading size="small" />;
+      return (
+        <View style={{marginTop: 10, flex: 1}}>
+          <SkeletonContent
+            containerStyle={theme.skeletonLeadersStyle}
+            boneColor={theme.skeleton}
+            highlightColor={theme.skeletonHighlight}
+            animationDirection="horizontalLeft"
+            layout={theme.leadersSkeleton}
+          />
+          <SkeletonContent
+            containerStyle={theme.skeletonLeadersStyle}
+            boneColor={theme.skeleton}
+            highlightColor={theme.skeletonHighlight}
+            animationDirection="horizontalLeft"
+            layout={theme.leadersSkeleton}
+          />
+        </View>
+      );
     }
     const {team, pointsLeader, reboundLeader, assistLeader} = this.state;
-    reactotron.log('pointsLeader', pointsLeader.info);
     return (
       <View style={{marginTop: 5}}>
         <TouchableOpacity
@@ -193,7 +208,6 @@ export default class Team extends Component {
           }>
           <StatLeader team={team} name="REB" player={reboundLeader} />
         </TouchableOpacity>
-
         <TouchableOpacity
           onPress={() =>
             this.props.navigation.navigate('Player', assistLeader.info)
@@ -206,7 +220,15 @@ export default class Team extends Component {
 
   renderTeamStats = scrollOpacity => {
     if (this.state.statsLoading) {
-      return <Loading size="small" />;
+      return (
+        <SkeletonContent
+          containerStyle={theme.skeletonTeamRankStyle}
+          boneColor={theme.skeleton}
+          highlightColor={theme.skeletonHighlight}
+          animationDirection="horizontalLeft"
+          layout={theme.teamRankSkeleton}
+        />
+      );
     }
     const {teamStats} = this.state;
     return (
@@ -266,7 +288,15 @@ export default class Team extends Component {
 
   renderStats = () => {
     if (this.state.statsLoading) {
-      return <Loading size="small" />;
+      return (
+        <SkeletonContent
+          containerStyle={theme.skeletonTeamRankStyle}
+          boneColor={theme.skeleton}
+          highlightColor={theme.skeletonHighlight}
+          animationDirection="horizontalLeft"
+          layout={theme.teamRankSkeleton}
+        />
+      );
     }
     return (
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -280,7 +310,17 @@ export default class Team extends Component {
 
   renderNews = () => {
     if (this.state.newsLoading) {
-      return <Loading size="small" />;
+      return (
+        <View style={{marginHorizontal: -24}}>
+          <SkeletonContent
+            containerStyle={theme.skeletonTeamRankStyle}
+            boneColor={theme.skeleton}
+            highlightColor={theme.skeletonHighlight}
+            animationDirection="horizontalLeft"
+            layout={theme.teamNewsSkeleton}
+          />
+        </View>
+      );
     }
     const {news} = this.state;
     return (
@@ -293,7 +333,24 @@ export default class Team extends Component {
   renderRoster = () => {
     const {roster, rosterLoading, leadersLoading} = this.state;
     if (rosterLoading || leadersLoading) {
-      return <Loading size="small" />;
+      return (
+        <View style={{marginTop: 10, flex: 1}}>
+          <SkeletonContent
+            containerStyle={theme.skeletonLeadersStyle}
+            boneColor={theme.skeleton}
+            highlightColor={theme.skeletonHighlight}
+            animationDirection="horizontalLeft"
+            layout={theme.leadersSkeleton}
+          />
+          <SkeletonContent
+            containerStyle={theme.skeletonLeadersStyle}
+            boneColor={theme.skeleton}
+            highlightColor={theme.skeletonHighlight}
+            animationDirection="horizontalLeft"
+            layout={theme.leadersSkeleton}
+          />
+        </View>
+      );
     }
     return (
       <FlatList
@@ -400,7 +457,6 @@ export default class Team extends Component {
       `https://stats.nba.com/team/${team.teamId}/boxscores-scoring/`,
     )
       .then(supported => {
-        reactotron.log(supported);
         if (!supported) {
           Alert.alert('We found no apps that can open this video');
         } else {
@@ -414,20 +470,21 @@ export default class Team extends Component {
 
   openSchedule() {
     const {team} = this.state;
-    Linking.canOpenURL(
-      `https://stats.nba.com/schedule/#!?TeamID=${team.teamId}`,
-    )
-      .then(supported => {
-        reactotron.log(supported);
-        if (!supported) {
-          Alert.alert('We found no apps that can open this video');
-        } else {
-          return Linking.openURL(
-            `https://stats.nba.com/schedule/#!?TeamID=${team.teamId}`,
-          );
-        }
-      })
-      .catch(err => console.error('An error occurred', err));
+    this.props.navigation.navigate('TeamSchedule', team);
+    // Linking.canOpenURL(
+    //   `https://stats.nba.com/schedule/#!?TeamID=${team.teamId}`,
+    // )
+    //   .then(supported => {
+    //     reactotron.log(supported);
+    //     if (!supported) {
+    //       Alert.alert('We found no apps that can open this video');
+    //     } else {
+    //       return Linking.openURL(
+    //         `https://stats.nba.com/schedule/#!?TeamID=${team.teamId}`,
+    //       );
+    //     }
+    //   })
+    //   .catch(err => console.error('An error occurred', err));
   }
 
   onScrollEndDrag = e => {
@@ -497,13 +554,17 @@ export default class Team extends Component {
             />
           </Animated.View>
         </Animated.View>
-        <Card titleStyle={{marginBottom: 10}} title="Stats (Per Game)">
+        <Card
+          titleStyle={{marginBottom: 10}}
+          title="Stats (Per Game)"
+          style={{height: 100.857}}>
           {this.renderStats()}
         </Card>
         <Card
           titleStyle={{marginBottom: 10}}
           title="News"
           subtitle="See all"
+          style={{height: 362.285}}
           handleMore={() =>
             this.setState({modalContent: 'news', modalVisible: true})
           }>
@@ -513,6 +574,7 @@ export default class Team extends Component {
           titleBorder
           titleStyle={{marginBottom: 5}}
           title="Leaders"
+          style={{height: 232.285}}
           handleMore={() =>
             this.setState({modalContent: 'leaders', modalVisible: true})
           }
@@ -523,6 +585,7 @@ export default class Team extends Component {
           titleBorder
           titleStyle={{marginBottom: 5}}
           title="Roster"
+          style={{height: 337.142}}
           handleMore={() =>
             this.setState({modalContent: 'roster', modalVisible: true})
           }

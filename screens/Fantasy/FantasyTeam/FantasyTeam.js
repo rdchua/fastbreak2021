@@ -37,6 +37,7 @@ export default class FantasyTeam extends Component {
       playersLoading: true,
       statsLoading: true,
       gamesLoading: true,
+      dateType: 'date',
       dateText: moment().format('dddd, MMM DD'),
       date: moment
         .tz(moment().startOf('day'), 'America/New_York')
@@ -65,7 +66,7 @@ export default class FantasyTeam extends Component {
           });
           this.fetchTeam(team_key, token.access_token);
           this.fetchStats(team_key, token.access_token, 'date', date);
-          this.fetchRoster(date, team_key, token.access_token);
+          this.fetchRoster(team_key, token.access_token, 'date', date);
         }
       });
     });
@@ -84,6 +85,7 @@ export default class FantasyTeam extends Component {
 
   fetchTeam(team_key, token) {
     getTeamStanding(team_key, token).then(response => {
+      reactotron.log(response);
       const standing = response.fantasy_content.team[1].team_standings;
       const team = mapTeam(response.fantasy_content.team[0]);
       team.standings = standing;
@@ -109,6 +111,7 @@ export default class FantasyTeam extends Component {
 
   fetchRoster(team_key, token, type, date) {
     getRoster(team_key, token, type, date).then(response => {
+      reactotron.log(response);
       const roster = mapRoster(response.fantasy_content.team[1].roster);
       reactotron.log(date, roster);
       this.setState({roster: roster, rosterLoading: false});
@@ -172,6 +175,7 @@ export default class FantasyTeam extends Component {
           rosterLoading: true,
           statsLoading: true,
           currentWeek: newWeek,
+          dateText: `Week ${newWeek}`,
         },
         () => {
           const {currentWeek, teamKey, token} = this.state;
@@ -201,7 +205,7 @@ export default class FantasyTeam extends Component {
         () => {
           const {date, teamKey, token} = this.state;
           this.fetchScoreboard();
-          this.fetchRoster(teamKey, token, '' ,date);
+          this.fetchRoster(teamKey, token, '', date);
           this.fetchStats(teamKey, token, 'date', date);
         },
       );
@@ -212,12 +216,13 @@ export default class FantasyTeam extends Component {
           rosterLoading: true,
           statsLoading: true,
           currentWeek: newWeek,
+          dateText: `Week ${newWeek}`,
         },
         () => {
           const {currentWeek, teamKey, token} = this.state;
           reactotron.log('currentweek', currentWeek);
           this.fetchScoreboard();
-          this.fetchRoster(currentWeek, teamKey, token, 'week');
+          this.fetchRoster(teamKey, token, 'week', currentWeek);
           this.fetchStats(teamKey, token, 'week', currentWeek);
         },
       );
@@ -268,16 +273,26 @@ export default class FantasyTeam extends Component {
       case 0:
         this.fetchRoster(teamKey, token, '', date);
         this.fetchStats(teamKey, token, 'date', date);
-        this.setState({dateType: 'date', dateDisabled: false});
+        this.setState({
+          dateType: 'date',
+          dateDisabled: false,
+          dateText: moment(this.state.date, 'YYYY-MM-DD').format(
+            'dddd, MMM DD',
+          ),
+        });
         break;
       case 1:
-        this.fetchRoster(currentWeek, teamKey, token, 'week');
+        this.fetchRoster(teamKey, token, 'week', currentWeek);
         this.fetchStats(teamKey, token, 'week', currentWeek);
-        this.setState({dateType: 'week', dateDisabled: false});
+        this.setState({
+          dateType: 'week',
+          dateDisabled: false,
+          dateText: `Week ${currentWeek}`,
+        });
         break;
       case 2:
         this.fetchRoster(teamKey, token, 'season', date);
-        this.setState({dateDisabled: false});
+        this.setState({dateDisabled: true});
         break;
       default:
         this.fetchRoster(teamKey, token, '', date);
@@ -335,25 +350,20 @@ export default class FantasyTeam extends Component {
             <ModalDropdown
               style={styles.date}
               textStyle={styles.textStyle}
-              defaultValue={`${dateText}`}
+              defaultValue={'Daily'}
               dropdownStyle={styles.dropdownStyle}
               dropdownTextStyle={styles.dropdownTextStyle}
-              renderButtonText={()}
               dropdownTextHighlightStyle={styles.dropdownTextHighlightStyle}
               defaultIndex={0}
               onSelect={this.handleDropdownSelect}
               renderSeparator={() => {
                 return <View style={{height: 0.7, backgroundColor: '#333'}} />;
               }}
-              options={[
-                `${dateText}`,
-                `Week ${currentWeek} (Total)`,
-                'Season (Total)',
-              ]}
+              options={[`Daily`, `Weekly`, 'Season (Total)']}
             />
             <Icon style={styles.icon} name="caretdown" color="#fff" size={10} />
           </View>
-          {/* <AnimatedText style={styles.date}>{dateText}</AnimatedText> */}
+          <AnimatedText style={styles.date}>{dateText}</AnimatedText>
           <TouchableOpacity
             disabled={dateDisabled}
             onPress={() => this.handleNextDay()}

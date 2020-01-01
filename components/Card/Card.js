@@ -1,10 +1,33 @@
 import React, {PureComponent} from 'react';
-import {View, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Platform,
+  TouchableOpacity,
+  UIManager,
+  LayoutAnimation,
+} from 'react-native';
 import {styles} from './Card.styles';
 import AnimatedText from '../AnimatedText/AnimatedText';
+import reactotron from 'reactotron-react-native';
+if (
+  Platform.OS === 'android' &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 export default class Card extends PureComponent {
   constructor(props) {
     super(props);
+  }
+
+  componentDidUpdate(nextProps, prevState) {
+    LayoutAnimation.configureNext(
+      LayoutAnimation.create(
+        150,
+        'easeInEaseOut',
+        LayoutAnimation.Properties.opacity,
+      ),
+    );
   }
 
   renderSubTitle = subtitle => {
@@ -22,6 +45,11 @@ export default class Card extends PureComponent {
     if (title) {
       return (
         <View
+          onLayout={e => {
+            if (this.props.printLayout) {
+              reactotron.log(e);
+            }
+          }}
           style={[
             titleStyle,
             titleBorder ? styles.border : null,
@@ -38,7 +66,13 @@ export default class Card extends PureComponent {
   render() {
     const props = {...this.props};
     return (
-      <View style={[styles.container, props.style]}>
+      <View
+        style={[styles.container, props.style]}
+        onLayout={e => {
+          if (props.printLayout) {
+            reactotron.log(e);
+          }
+        }}>
         {this.renderTitle()}
         {props.children}
       </View>

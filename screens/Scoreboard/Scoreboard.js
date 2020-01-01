@@ -8,8 +8,6 @@ import Header from '../../components/Header/Header';
 import GamesPage from '../Games/Games';
 import moment from 'moment-timezone';
 import * as theme from '../../Theme';
-import {styles} from './Scorebord.styles';
-import Modal from 'react-native-modal';
 
 export default class DailyTabs extends Component {
   constructor(props) {

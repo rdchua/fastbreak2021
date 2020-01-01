@@ -18,7 +18,7 @@ export const styles = StyleSheet.create({
   title: {
     flex: 1,
     // fontWeight: 'bold',
-    color: 'white',
+    color: theme.textPrimary,
     textTransform: 'uppercase',
   },
   subtitle: {

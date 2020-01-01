@@ -33,7 +33,7 @@ export const styles = StyleSheet.create({
     width: screenWidth,
     position: 'absolute',
     bottom: 40,
-    left: 10,
+    left: 15,
     zIndex: 3,
     paddingRight: 100,
   },

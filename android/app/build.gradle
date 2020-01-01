@@ -132,7 +132,7 @@ android {
         applicationId "com.fastbreak.nba"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 57
+        versionCode 61
         versionName "1.1"
     }
     splits {

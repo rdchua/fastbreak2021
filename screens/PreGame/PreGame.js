@@ -14,7 +14,18 @@ import {
   getPlayers,
   headshot,
 } from '../../api/data.nba';
-import {cardBackground} from '../../Theme';
+import {
+  cardBackground,
+  skeletonTeamNewsStyle,
+  skeleton,
+  skeletonHighlight,
+  teamStatsSkeleton,
+  skeletonStyle,
+  newsTextSkeleton,
+  preGameLeadersLayout,
+  preGameStyle,
+  skeletonTeamStatsStyle,
+} from '../../Theme';
 import {
   getTeamImage,
   getTeamDetails,
@@ -29,6 +40,7 @@ import TeamStat from '../../components/TeamStat/TeamStat';
 import Loading from '../../components/Loading/Loading';
 import NewsText from '../../components/NewsText/NewsText';
 import PlayerComapare from '../../components/PlayerCompare/PlayerComapare';
+import SkeletonContent from 'react-native-skeleton-content-nonexpo';
 export default class PreGame extends Component {
   constructor(props) {
     super(props);
@@ -128,14 +140,23 @@ export default class PreGame extends Component {
   };
 
   renderRecapArticle = () => {
-    const {article} = this.state;
-    if (this.state.recapLoading) {
-      return <Loading size="small" />;
-    }
-    return article ? (
-      <NewsText title={article.title} body={article.paragraphs[0].paragraph} />
-    ) : (
-      <NewsText title="" body="No Preview Article" />
+    const {article, recapLoading} = this.state;
+    return (
+      <SkeletonContent
+        containerStyle={skeletonStyle}
+        boneColor={skeleton}
+        isLoading={recapLoading}
+        highlightColor={skeletonHighlight}
+        layout={newsTextSkeleton}>
+        {article ? (
+          <NewsText
+            title={article.title}
+            body={article.paragraphs[0].paragraph}
+          />
+        ) : (
+          <NewsText title="" body="No Article" />
+        )}
+      </SkeletonContent>
     );
   };
 
@@ -164,7 +185,28 @@ export default class PreGame extends Component {
       leadersLoading,
     } = this.state;
     if (playersLoading || leadersLoading) {
-      return <Loading size="small" />;
+      return (
+        <View>
+          <SkeletonContent
+            layout={preGameLeadersLayout}
+            containerStyle={preGameStyle}
+            boneColor={skeleton}
+            highlightColor={skeletonHighlight}
+          />
+          <SkeletonContent
+            layout={preGameLeadersLayout}
+            containerStyle={preGameStyle}
+            boneColor={skeleton}
+            highlightColor={skeletonHighlight}
+          />
+          <SkeletonContent
+            layout={preGameLeadersLayout}
+            containerStyle={preGameStyle}
+            boneColor={skeleton}
+            highlightColor={skeletonHighlight}
+          />
+        </View>
+      );
     }
     const homeLeaderPoints = getPlayerDetails(
       players,
@@ -228,7 +270,28 @@ export default class PreGame extends Component {
   renderTeamStats = (homeTeamColor, awayTeamColor, awayTeam, homeTeam) => {
     const {homeTeamStats, awayTeamStats} = this.state;
     if (this.state.prevMatchupLoading || (!homeTeamStats && !awayTeamStats)) {
-      return <Loading size="small" />;
+      return (
+        <View>
+          <SkeletonContent
+            containerStyle={skeletonTeamStatsStyle}
+            boneColor={skeleton}
+            highlightColor={skeletonHighlight}
+            layout={teamStatsSkeleton}
+          />
+          <SkeletonContent
+            containerStyle={skeletonTeamStatsStyle}
+            boneColor={skeleton}
+            highlightColor={skeletonHighlight}
+            layout={teamStatsSkeleton}
+          />
+          <SkeletonContent
+            containerStyle={skeletonTeamStatsStyle}
+            boneColor={skeleton}
+            highlightColor={skeletonHighlight}
+            layout={teamStatsSkeleton}
+          />
+        </View>
+      );
     } else {
       return (
         <View>
@@ -379,10 +442,13 @@ export default class PreGame extends Component {
           </TouchableOpacity>
         </View>
         <Card>{this.renderRecapArticle()}</Card>
-        <Card titleStyle={{marginBottom: 10}} title="Leaders">
+        <Card
+          style={{height: 234.857}}
+          titleStyle={{marginBottom: 10}}
+          title="Leaders">
           {this.renderLeaders()}
         </Card>
-        <Card title="Previous matchup">
+        <Card style={{height: 411.428}} title="Previous matchup">
           {this.renderTeamStats(
             awayTeam.primaryColor,
             homeTeam.primaryColor,

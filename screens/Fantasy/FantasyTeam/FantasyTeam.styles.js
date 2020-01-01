@@ -94,6 +94,7 @@ export const styles = StyleSheet.create({
     marginRight: 10,
   },
   date: {
+    color: theme.textPrimary,
     marginTop: -2,
   },
   dropdownStyle: {

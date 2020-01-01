@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
-import {View, ScrollView, FlatList, Image} from 'react-native';
+import {View, ScrollView, FlatList, Image, Linking} from 'react-native';
 import {styles} from './News.styles';
 import {getNews1, clutchpoints, getPlayerNews} from '../../api/news';
-import {getVideos} from '../../api/youtube';
+import {getVideos, getUserVideos} from '../../api/youtube';
 import LinearGradient from 'react-native-linear-gradient';
 import Header from '../../components/Header/Header';
 import Card from '../../components/Card/Card';
@@ -18,6 +18,9 @@ import Video2 from '../../components/Video2/Video2';
 import Modal from 'react-native-modal';
 import {sortBy} from 'underscore';
 import moment from 'moment';
+import firebase from 'react-native-firebase';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import SkeletonContent from 'react-native-skeleton-content-nonexpo';
 const gradient = [
   'transparent',
   'rgba(18, 19, 20, 0.3)',
@@ -45,6 +48,7 @@ export default class News extends Component {
 
   fetchArticles() {
     clutchpoints().then(response => {
+      reactotron.log('articles', response);
       this.setState({
         news: response.data.results,
         newsLoading: false,
@@ -74,22 +78,23 @@ export default class News extends Component {
     /**
      * Channels Id's:
      * NBA on ESPN = UUVSSpcmZD2PwPBqb8yKQKBA (channel1)
-     * NBA on TNT    = UUrII9ybMS20om0HGGt2hy3A (channel2)
+     * NBA on TNT    = UCpGimyrbwRtrcJ-CIiRDXbA (channel2)
      */
     const channel1 = 'UUVSSpcmZD2PwPBqb8yKQKBA';
-    const channel2 = 'UUrII9ybMS20om0HGGt2hy3A';
-    Promise.all([getVideos(channel1), getVideos(channel2)]).then(
-      ([espn, tnt]) => {
+    const channel2 = 'UUWJ2lWNubArHWmf3FIHbfcQ';
+    Promise.all([getVideos(channel1), getVideos(channel2)])
+      .then(([espn, tnt]) => {
         let videos = sortBy(espn.data.items.concat(tnt.data.items), video =>
           moment(video.snippet.publishedAt),
         );
         videos = videos.reverse();
+        reactotron.log('videos', videos);
         this.setState({
           videos: videos,
           videosLoading: false,
         });
-      },
-    );
+      })
+      .catch(err => reactotron.log(err));
   }
 
   renderHeadline = ({item, index}) => {
@@ -107,7 +112,28 @@ export default class News extends Component {
   renderRotowire = () => {
     const {rotowire, rotowireLoading} = this.state;
     if (rotowireLoading) {
-      return <Loading size="small" />;
+      return (
+        <View style={{flex: 1}}>
+          <SkeletonContent
+            boneColor={theme.skeleton}
+            highlightColor={theme.skeletonHighlight}
+            layout={theme.rotowireLayout}
+            containerStyle={theme.rotowireStyle}
+          />
+          <SkeletonContent
+            boneColor={theme.skeleton}
+            highlightColor={theme.skeletonHighlight}
+            layout={theme.rotowireLayout}
+            containerStyle={theme.rotowireStyle}
+          />
+          <SkeletonContent
+            boneColor={theme.skeleton}
+            highlightColor={theme.skeletonHighlight}
+            layout={theme.rotowireLayout}
+            containerStyle={theme.rotowireStyle}
+          />
+        </View>
+      );
     }
     return (
       <FlatList
@@ -130,7 +156,40 @@ export default class News extends Component {
   renderOthers = () => {
     const {othersLoading, otherNews} = this.state;
     if (othersLoading) {
-      return <Loading size="small" />;
+      return (
+        <View style={{flex: 1}}>
+          <SkeletonContent
+            boneColor={theme.skeleton}
+            highlightColor={theme.skeletonHighlight}
+            layout={theme.otherNewsLayout}
+            containerStyle={theme.otherNewsStyle}
+          />
+          <SkeletonContent
+            boneColor={theme.skeleton}
+            highlightColor={theme.skeletonHighlight}
+            layout={theme.otherNewsLayout}
+            containerStyle={theme.otherNewsStyle}
+          />
+          <SkeletonContent
+            boneColor={theme.skeleton}
+            highlightColor={theme.skeletonHighlight}
+            layout={theme.otherNewsLayout}
+            containerStyle={theme.otherNewsStyle}
+          />
+          <SkeletonContent
+            boneColor={theme.skeleton}
+            highlightColor={theme.skeletonHighlight}
+            layout={theme.otherNewsLayout}
+            containerStyle={theme.otherNewsStyle}
+          />
+          <SkeletonContent
+            boneColor={theme.skeleton}
+            highlightColor={theme.skeletonHighlight}
+            layout={theme.otherNewsLayout}
+            containerStyle={theme.otherNewsStyle}
+          />
+        </View>
+      );
     }
     return (
       <FlatList
@@ -145,7 +204,40 @@ export default class News extends Component {
   renderVideos = () => {
     const {videos, videosLoading} = this.state;
     if (videosLoading || !videos) {
-      return <Loading />;
+      return (
+        <View style={{flex: 1}}>
+          <SkeletonContent
+            boneColor={theme.skeleton}
+            highlightColor={theme.skeletonHighlight}
+            layout={theme.videosLayout}
+            containerStyle={theme.videosStyle}
+          />
+          <SkeletonContent
+            boneColor={theme.skeleton}
+            highlightColor={theme.skeletonHighlight}
+            layout={theme.videosLayout}
+            containerStyle={theme.videosStyle}
+          />
+          <SkeletonContent
+            boneColor={theme.skeleton}
+            highlightColor={theme.skeletonHighlight}
+            layout={theme.videosLayout}
+            containerStyle={theme.videosStyle}
+          />
+          <SkeletonContent
+            boneColor={theme.skeleton}
+            highlightColor={theme.skeletonHighlight}
+            layout={theme.videosLayout}
+            containerStyle={theme.videosStyle}
+          />
+          <SkeletonContent
+            boneColor={theme.skeleton}
+            highlightColor={theme.skeletonHighlight}
+            layout={theme.videosLayout}
+            containerStyle={theme.videosStyle}
+          />
+        </View>
+      );
     }
     return (
       <FlatList
@@ -208,38 +300,86 @@ export default class News extends Component {
     }
   }
 
-  render() {
-    if (this.state.newsLoading) {
-      return <Loading backgroundColor={theme.darkBackground} />;
+  openNews(article) {
+    this.showAd();
+    Linking.openURL(article.source);
+  }
+
+  showAd() {
+    const advert = firebase
+      .admob()
+      .interstitial('ca-app-pub-1108597602432224/5355417587');
+    const AdRequest = firebase.admob.AdRequest;
+    const request = new AdRequest();
+    request.addKeyword('foo').addKeyword('bar');
+    advert.loadAd(request.build());
+    advert.on('onAdLoaded', () => {
+      if (advert.isLoaded()) {
+        advert.show();
+      }
+    });
+  }
+
+  renderHero = () => {
+    const {newsLoading, news} = this.state;
+    if (newsLoading) {
+      return (
+        <SkeletonContent
+          layout={theme.newsHeroLayout}
+          boneColor={theme.skeleton}
+          highlightColor={theme.skeletonHighlight}
+          containerStyle={theme.newsHeroStyle}
+        />
+      );
     }
-    const {news} = this.state;
+    return (
+      <View style={styles.heroContainer}>
+        <View style={styles.hero}>
+          <TouchableOpacity>
+            <Image source={{uri: news[3].cover}} style={styles.heroImage} />
+          </TouchableOpacity>
+        </View>
+        <LinearGradient colors={gradient} style={styles.heroContainer}>
+          <View style={styles.heroTextContainer}>
+            <AnimatedText style={styles.heroTextSnip}>FEATURED</AnimatedText>
+            <AnimatedText style={styles.heroText} numberOfLines={3}>
+              {news[3].title}
+            </AnimatedText>
+          </View>
+        </LinearGradient>
+      </View>
+    );
+  };
+
+  renderArticles = () => {
+    const {newsLoading, news} = this.state;
+    if (newsLoading) {
+      return <View style={{height: 150}}></View>;
+    }
+    return (
+      <FlatList
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.headline}
+        contentContainerStyle={styles.headlineContent}
+        data={news.slice(0, 25)}
+        keyExtractor={item => item.id}
+        renderItem={this.renderHeadline}
+      />
+    );
+  };
+
+  render() {
     return (
       <View style={{flex: 1}}>
         <Header navigation={this.props.navigation} />
         <ScrollView
           contentContainerStyle={styles.contentContainer}
           style={styles.container}>
-          <View style={styles.hero}>
-            <Image source={{uri: news[3].cover}} style={styles.heroImage} />
-          </View>
-          <LinearGradient colors={gradient} style={styles.heroContainer}>
-            <View style={styles.heroTextContainer}>
-              <AnimatedText style={styles.heroTextSnip}>FEATURED</AnimatedText>
-              <AnimatedText style={styles.heroText} numberOfLines={3}>
-                {news[3].title}
-              </AnimatedText>
-            </View>
-          </LinearGradient>
-          <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.headline}
-            contentContainerStyle={styles.headlineContent}
-            data={news.slice(0, 25)}
-            keyExtractor={item => item.id}
-            renderItem={this.renderHeadline}
-          />
+          {this.renderHero()}
+          {this.renderArticles()}
           <Card
+            style={{height: 427.714}}
             handleMore={() =>
               this.setState({
                 modalContent: 'players',
@@ -252,6 +392,7 @@ export default class News extends Component {
             {this.renderRotowire()}
           </Card>
           <Card
+            style={{height: 533.142}}
             handleMore={() =>
               this.setState({
                 modalContent: 'news',
@@ -264,6 +405,7 @@ export default class News extends Component {
             {this.renderOthers()}
           </Card>
           <Card
+            style={{height: 599.714}}
             handleMore={() =>
               this.setState({
                 modalContent: 'videos',

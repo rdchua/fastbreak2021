@@ -1,11 +1,10 @@
 /* eslint-disable radix */
 /* eslint-disable react-native/no-inline-styles */
-import React, {Component} from 'react';
+import React, {PureComponent} from 'react';
 import {View} from 'react-native';
 import AnimatedText from '../AnimatedText/AnimatedText';
 import {styles} from './TeamStat.styles';
-import reactotron from 'reactotron-react-native';
-export default class TeamStat extends Component {
+export default class TeamStat extends PureComponent {
   printValue = (stat, stat2) => {
     if (stat2) {
       return `${stat}/${stat2} (${(

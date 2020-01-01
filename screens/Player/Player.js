@@ -29,6 +29,7 @@ import Button from '../../components/Button/Button';
 import Store from 'react-native-simple-store';
 import ItemSeparator from '../../components/ItemSeparator';
 import Modal from 'react-native-modal';
+import SkeletonContent from 'react-native-skeleton-content-nonexpo';
 const headerHeight = 185;
 
 export default class Player extends Component {
@@ -182,7 +183,15 @@ export default class Player extends Component {
   renderNews = () => {
     const {news, newsLoading} = this.state;
     if (newsLoading) {
-      return <Loading />;
+      return (
+        <SkeletonContent
+          containerStyle={theme.skeletonStyle}
+          boneColor={theme.skeleton}
+          highlightColor={theme.skeletonHighlight}
+          animationDirection="horizontalLeft"
+          layout={theme.newsTextSkeleton}
+        />
+      );
     } else if (news.length === 0) {
       return <AnimatedText style={styles.empty}>No Recent News</AnimatedText>;
     } else {
@@ -235,7 +244,15 @@ export default class Player extends Component {
 
   renderProfile = () => {
     if (this.state.profileLoading) {
-      return <Loading size="small" />;
+      return (
+        <SkeletonContent
+          containerStyle={theme.skeletonTeamRankStyle}
+          boneColor={theme.skeleton}
+          highlightColor={theme.skeletonHighlight}
+          animationDirection="horizontalLeft"
+          layout={theme.teamRankSkeleton}
+        />
+      );
     }
     const {profile} = this.state;
     return (
@@ -325,25 +342,69 @@ export default class Player extends Component {
     }
   };
 
+  renderAverage = () => {
+    const {avgLoading, seasonAvgs} = this.state;
+    if (avgLoading) {
+      return (
+        <SkeletonContent
+          containerStyle={theme.skeletonLogsStyle}
+          boneColor={theme.skeleton}
+          highlightColor={theme.skeletonHighlight}
+          animationDirection="horizontalLeft"
+          layout={theme.playerLogsSkeleton}
+        />
+      );
+    }
+    return (
+      <ScrollView showsHorizontalScrollIndicator={false} horizontal={true}>
+        <FlatList
+          data={seasonAvgs.slice(0, 3)}
+          ItemSeparatorComponent={() => <ItemSeparator />}
+          ListHeaderComponent={<StatsNbaHeader title="Regular Season" />}
+          keyExtractor={item => item[2]}
+          renderItem={this.renderSeasonAvg}
+        />
+      </ScrollView>
+    );
+  };
+
+  renderLogs = () => {
+    const {logsLoading, logs} = this.state;
+    if (logsLoading) {
+      return (
+        <SkeletonContent
+          containerStyle={[theme.skeletonLogsStyle, {marginTop: -30}]}
+          boneColor={theme.skeleton}
+          highlightColor={theme.skeletonHighlight}
+          animationDirection="horizontalLeft"
+          layout={theme.playerLogsSkeleton}
+        />
+      );
+    }
+    return (
+      <ScrollView
+        style={{marginTop: 15}}
+        showsHorizontalScrollIndicator={false}
+        horizontal={true}>
+        <FlatList
+          data={logs.slice(0, 3)}
+          ItemSeparatorComponent={() => <ItemSeparator />}
+          ListHeaderComponent={<StatsNbaHeader title="Recent Games" />}
+          keyExtractor={item => item[2]}
+          renderItem={this.renderGames}
+        />
+      </ScrollView>
+    );
+  };
+
   render() {
-    const {
-      player,
-      logs,
-      logsLoading,
-      avgLoading,
-      seasonAvgs,
-      myTeamButtonActive,
-    } = this.state;
+    const {player, logs, myTeamButtonActive} = this.state;
     const scrollOpacity = this.scrollY.interpolate({
       inputRange: [0, headerHeight],
       outputRange: [1, 0],
       extrapolate: 'clamp',
     });
-    if (logsLoading || avgLoading) {
-      return <Loading backgroundColor={theme.darkBackground} />;
-    }
     const team = getTeamDetails(player.teamId);
-    const teamImage = getTeamImage(team.triCode);
     return (
       <ScrollView
         ref={this.contentView}
@@ -398,31 +459,15 @@ export default class Player extends Component {
         <Card
           titleStyle={{marginBottom: 10}}
           title="stats"
+          style={{height: 328.714}}
           subtitle="Game Log"
           handleMore={() => this.setState({modalVisible: true})}>
-          <ScrollView showsHorizontalScrollIndicator={false} horizontal={true}>
-            <FlatList
-              data={seasonAvgs.slice(0, 3)}
-              ItemSeparatorComponent={() => <ItemSeparator />}
-              ListHeaderComponent={<StatsNbaHeader title="Regular Season" />}
-              keyExtractor={item => item[2]}
-              renderItem={this.renderSeasonAvg}
-            />
-          </ScrollView>
-          <ScrollView
-            style={{marginTop: 15}}
-            showsHorizontalScrollIndicator={false}
-            horizontal={true}>
-            <FlatList
-              data={logs.slice(0, 3)}
-              ItemSeparatorComponent={() => <ItemSeparator />}
-              ListHeaderComponent={<StatsNbaHeader title="Recent Games" />}
-              keyExtractor={item => item[2]}
-              renderItem={this.renderGames}
-            />
-          </ScrollView>
+          {this.renderAverage()}
+          {this.renderLogs()}
         </Card>
-        <Card titleStyle={{marginTop: 5}} style={{marginTop: 5}}>
+        <Card
+          titleStyle={{marginTop: 5}}
+          style={{marginTop: 5, height: 535.142}}>
           {this.renderNews()}
         </Card>
         <Modal

@@ -17,7 +17,13 @@ import {
 import FantasyPlayer from '../../../components/FantasyPlayer/FantasyPlayer';
 import Card from '../../../components/Card/Card';
 import AnimatedText from '../../../components/AnimatedText/AnimatedText';
-import {accent, red, textSecondary, textPrimary} from '../../../Theme';
+import {
+  accent,
+  red,
+  textSecondary,
+  textPrimary,
+  darkBackground,
+} from '../../../Theme';
 import FantasyTeamStat from '../../../components/FantasyTeamStat/FantasyTeamStat';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {getRoster} from '../../../api/fantasy';
@@ -28,6 +34,7 @@ import Store from 'react-native-simple-store';
 import moment from 'moment';
 import {getPlayers, getScoreboard} from '../../../api/data.nba';
 import FantasyBoxscore from '../../../components/FantasyBoxscore/FantasyBoxscore';
+import Loading from '../../../components/Loading/Loading';
 
 export default class Matchup extends Component {
   constructor(props) {
@@ -98,14 +105,15 @@ export default class Matchup extends Component {
 
   fetchTeam(team_key, token, type) {
     const {date} = this.state;
-    getRoster(team_key, token, date, false).then(response => {
+    getRoster(team_key, token, 'date', date).then(response => {
+      reactotron.log('roster', roster);
       const roster = mapRoster(response.fantasy_content.team[1].roster);
       if (type === 1) {
         reactotron.log('home team', roster);
-        this.setState({homeRoster: roster, rosterLoading: false});
+        this.setState({homeRoster: roster, homeRosterLoading: false});
       } else {
         reactotron.log('away team', roster);
-        this.setState({awayRoster: roster, rosterLoading: false});
+        this.setState({awayRoster: roster, awayRosterLoading: false});
       }
     });
   }
@@ -219,7 +227,8 @@ export default class Matchup extends Component {
       homeRoster,
       awayRoster,
       gamesLoading,
-      rosterLoading,
+      homeRosterLoading,
+      awayRosterLoading,
       games,
     } = this.state;
     const {matchup} = this.props;
@@ -243,22 +252,26 @@ export default class Matchup extends Component {
         />
       );
     } else if (active === 1) {
+      if (homeRosterLoading) {
+        return <Loading size="small" backgroundColor={darkBackground} />;
+      }
       return (
         <FantasyBoxscore
           players={players}
           roster={homeRoster}
           gamesLoading={gamesLoading}
-          rosterLoading={rosterLoading}
           games={games}
         />
       );
     } else {
+      if (awayRosterLoading) {
+        return <Loading size="small" backgroundColor={darkBackground} />;
+      }
       return (
         <FantasyBoxscore
           players={players}
           roster={awayRoster}
           gamesLoading={gamesLoading}
-          rosterLoading={rosterLoading}
           games={games}
         />
       );

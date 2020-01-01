@@ -24,3 +24,9 @@ export const getVideos = channelId => {
     `https://www.googleapis.com/youtube/v3/playlistItems/?key=AIzaSyDEi4HOiHEsj42H9w-O0RgXaIoodkPe548&playlistId=${channelId}&part=snippet,id,contentDetails&order=date&maxResults=25`,
   );
 };
+
+export const getUserVideos = channelId => {
+  return axios.get(
+    `https://www.googleapis.com/youtube/v3/channels?part=snippet,id,contentDetails&forUsername=${channelId}&order=date&maxResults=25&key=AIzaSyDEi4HOiHEsj42H9w-O0RgXaIoodkPe548`,
+  );
+};

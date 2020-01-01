@@ -22,6 +22,18 @@ import Loading from '../../../components/Loading/Loading';
 import GameLeader from '../../../components/GameLeader/GameLeader';
 import TeamStat from '../../../components/TeamStat/TeamStat';
 import NewsText from '../../../components/NewsText/NewsText';
+import SkeletonContent from 'react-native-skeleton-content-nonexpo';
+import {
+  skeleton,
+  skeletonStyle,
+  skeletonHighlight,
+  screenWidth,
+  newsTextSkeleton,
+  leadersSkeleton,
+  skeletonLeadersStyle,
+  skeletonTeamStatsStyle,
+  teamStatsSkeleton,
+} from '../../../Theme';
 
 export default class GameStats extends Component {
   constructor(props) {
@@ -31,6 +43,7 @@ export default class GameStats extends Component {
       recapLoading: true,
       boxscoreLoading: true,
     };
+    this.contentView = React.createRef();
     this.interval;
   }
 
@@ -180,17 +193,23 @@ export default class GameStats extends Component {
   };
 
   renderRecapArticle = () => {
-    const {recapArticle} = this.state;
-    if (this.state.recapLoading) {
-      return <Loading size="small" />;
-    }
-    return recapArticle ? (
-      <NewsText
-        title={recapArticle.title}
-        body={recapArticle.paragraphs[3].paragraph}
-      />
-    ) : (
-      <NewsText title="" body="No Article" />
+    const {recapArticle, recapLoading} = this.state;
+    return (
+      <SkeletonContent
+        containerStyle={skeletonStyle}
+        boneColor={skeleton}
+        isLoading={recapLoading}
+        highlightColor={skeletonHighlight}
+        layout={newsTextSkeleton}>
+        {recapArticle ? (
+          <NewsText
+            title={recapArticle.title}
+            body={recapArticle.paragraphs[3].paragraph}
+          />
+        ) : (
+          <NewsText title="" body="No Article" />
+        )}
+      </SkeletonContent>
     );
   };
 
@@ -199,20 +218,31 @@ export default class GameStats extends Component {
   }
 
   renderLeaders = () => {
-    const {homeTeamLeader, awayTeamLeader} = this.state;
-    if (this.state.boxscoreLoading) {
-      return <Loading size="small" />;
-    }
+    const {homeTeamLeader, awayTeamLeader, boxscoreLoading} = this.state;
     return (
-      <View>
-        <GameLeader
-          handlePress={() => this.handlePlayerPress(awayTeamLeader)}
-          player={awayTeamLeader}
-        />
-        <GameLeader
-          handlePress={() => this.handlePlayerPress(homeTeamLeader)}
-          player={homeTeamLeader}
-        />
+      <View style={{flex: 1}}>
+        <SkeletonContent
+          isLoading={boxscoreLoading}
+          containerStyle={skeletonLeadersStyle}
+          boneColor={skeleton}
+          highlightColor={skeletonHighlight}
+          layout={leadersSkeleton}>
+          <GameLeader
+            handlePress={() => this.handlePlayerPress(awayTeamLeader)}
+            player={awayTeamLeader}
+          />
+        </SkeletonContent>
+        <SkeletonContent
+          isLoading={boxscoreLoading}
+          containerStyle={skeletonLeadersStyle}
+          boneColor={skeleton}
+          highlightColor={skeletonHighlight}
+          layout={leadersSkeleton}>
+          <GameLeader
+            handlePress={() => this.handlePlayerPress(homeTeamLeader)}
+            player={homeTeamLeader}
+          />
+        </SkeletonContent>
       </View>
     );
   };
@@ -220,7 +250,28 @@ export default class GameStats extends Component {
   renderTeamStats = (homeTeamColor, awayTeamColor) => {
     const {homeTeamStats, awayTeamStats} = this.state;
     if (this.state.boxscoreLoading || (!homeTeamStats && !awayTeamStats)) {
-      return <Loading size="small" />;
+      return (
+        <View>
+          <SkeletonContent
+            containerStyle={skeletonTeamStatsStyle}
+            boneColor={skeleton}
+            highlightColor={skeletonHighlight}
+            layout={teamStatsSkeleton}
+          />
+          <SkeletonContent
+            containerStyle={skeletonTeamStatsStyle}
+            boneColor={skeleton}
+            highlightColor={skeletonHighlight}
+            layout={teamStatsSkeleton}
+          />
+          <SkeletonContent
+            containerStyle={skeletonTeamStatsStyle}
+            boneColor={skeleton}
+            highlightColor={skeletonHighlight}
+            layout={teamStatsSkeleton}
+          />
+        </View>
+      );
     } else {
       return (
         <View style={styles.teamStatsContainer}>
@@ -337,6 +388,23 @@ export default class GameStats extends Component {
     this.getBoxscore();
   }
 
+  onScrollEndDrag = e => {
+    let scrollY = e.nativeEvent.contentOffset.y;
+    if (scrollY > this.props.headerHeight) {
+      //do nothing
+    } else if (this.props.headerHeight / 2 < scrollY) {
+      //clamp up
+      this.contentView.current.scrollTo({
+        x: 0,
+        y: this.props.headerHeight,
+        animated: true,
+      });
+    } else {
+      this.contentView.current.scrollTo({x: 0, y: 0, animated: true});
+      //clamp down
+    }
+  };
+
   render() {
     const {game} = this.state;
     const homeTeamImage = getTeamImage(game.hTeam.triCode);
@@ -355,6 +423,9 @@ export default class GameStats extends Component {
             onRefresh={this.onRefresh.bind(this)}
           />
         }
+        ref={this.contentView}
+        onScrollEndDrag={this.onScrollEndDrag}
+        onScroll={this.props.handleScroll}
         contentContainerStyle={styles.contentContainer}
         style={styles.container}>
         <View style={[styles.row, styles.scoreContainer]}>
@@ -391,8 +462,10 @@ export default class GameStats extends Component {
           </TouchableOpacity>
         </View>
         <Card>{this.renderRecapArticle()}</Card>
-        <Card title="LEADERS">{this.renderLeaders()}</Card>
-        <Card title="TEAM STATS">
+        <Card title="LEADERS" style={{height: 208.85}}>
+          {this.renderLeaders()}
+        </Card>
+        <Card title="TEAM STATS" style={{height: 595.71}}>
           <View style={[styles.row, {marginTop: 15}]}>
             <AnimatedText style={styles.teamNameSmall}>
               {awayTeam.triCode} {awayTeam.nickName}

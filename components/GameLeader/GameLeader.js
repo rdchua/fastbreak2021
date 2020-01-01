@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {PureComponent} from 'react';
 import {View, TouchableOpacity, Image, ScrollView} from 'react-native';
 import {styles} from './GameLeader.styles';
 import reactotron from 'reactotron-react-native';
@@ -12,7 +12,7 @@ const NORMAL_WIDTH = {width: 43 * fontScale};
 const PERCENT_WIDTH = {width: 60 * fontScale};
 const FRACTION_WIDTH = {marginRight: 10};
 
-export default class GameLeader extends Component {
+export default class GameLeader extends PureComponent {
   constructor(props) {
     super(props);
   }
