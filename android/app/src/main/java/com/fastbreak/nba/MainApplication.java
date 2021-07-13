@@ -12,6 +12,7 @@ import java.util.List;
 import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
 import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
 import io.invertase.firebase.admob.RNFirebaseAdMobPackage;
+import com.airbnb.android.react.lottie.LottiePackage;
 // import com.facebook.react.BuildConfig;
 
 public class MainApplication extends Application implements ReactApplication {
@@ -31,6 +32,7 @@ public class MainApplication extends Application implements ReactApplication {
           packages.add(new RNFirebaseMessagingPackage());
           packages.add(new RNFirebaseNotificationsPackage());
           packages.add(new RNFirebaseAdMobPackage());
+          packages.add(new LottiePackage());
           return packages;
         }
 

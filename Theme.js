@@ -33,6 +33,7 @@ export const textTertiary = '#737373';
 export const textHint = '#404040';
 export const skeleton = '#2a2a2a';
 export const skeletonHighlight = '#222';
+export const borderColor = '#2B2C2E';
 
 //Card
 export const cardBackground = '#1e1f21';
@@ -205,4 +206,32 @@ export const preGameStyle = {
 export const preGameLeadersLayout = [
   {width: 40, height: 40, borderRadius: 20, marginRight: 10},
   {flex: 1, height: 20, alignSelf: 'center'},
+];
+
+export const twitterStyle = {
+  flex: 1,
+  marginTop: 10,
+};
+export const twitterLayout = [
+  {
+    width: screenWidth,
+    height: 150,
+    borderRadius: 4,
+    marginBottom: 10,
+    marginHorizontal: 5,
+  },
+  {
+    width: screenWidth,
+    height: 150,
+    borderRadius: 4,
+    marginBottom: 10,
+    marginHorizontal: 5,
+  },
+  {
+    width: screenWidth,
+    height: 150,
+    borderRadius: 4,
+    marginBottom: 10,
+    marginHorizontal: 5,
+  },
 ];

@@ -4,26 +4,12 @@ import {styles} from './NewsFeed.styles';
 import AnimatedText from '../AnimatedText/AnimatedText';
 import moment from 'moment';
 import firebase from 'react-native-firebase';
+import {validatePurchase} from '../../utils/helper';
 
 export default class NewsFeed extends PureComponent {
   openNews(article) {
-    this.showAd();
+    validatePurchase('News');
     Linking.openURL(`https://sports.abs-cbn.com${article.link}`);
-  }
-
-  showAd() {
-    const advert = firebase
-      .admob()
-      .interstitial('ca-app-pub-1108597602432224/5355417587');
-    const AdRequest = firebase.admob.AdRequest;
-    const request = new AdRequest();
-    request.addKeyword('foo').addKeyword('bar');
-    advert.loadAd(request.build());
-    advert.on('onAdLoaded', () => {
-      if (advert.isLoaded()) {
-        advert.show();
-      }
-    });
   }
 
   render() {

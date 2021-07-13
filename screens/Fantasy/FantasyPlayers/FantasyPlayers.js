@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component} from 'reactn';
 import {
   View,
   ScrollView,
@@ -64,7 +64,7 @@ export default class FantasyPlayers extends Component {
   }
 
   fetchPlayers() {
-    getPlayers().then(response => {
+    getPlayers(this.global.seasonYear).then(response => {
       this.setState({
         players: response.data.league.standard,
         playersLoading: false,
@@ -183,7 +183,7 @@ export default class FantasyPlayers extends Component {
         />
       );
     } else {
-      return <View></View>;
+      return <View />;
     }
   };
 

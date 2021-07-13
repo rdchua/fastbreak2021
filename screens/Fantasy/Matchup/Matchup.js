@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component} from 'reactn';
 import {
   ScrollView,
   FlatList,
@@ -84,7 +84,7 @@ export default class Matchup extends Component {
   }
 
   fetchPlayers() {
-    getPlayers().then(response => {
+    getPlayers(this.global.seasonYear).then(response => {
       this.setState({
         players: response.data.league.standard,
         playersLoading: false,

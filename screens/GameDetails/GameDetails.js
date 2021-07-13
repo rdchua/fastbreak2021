@@ -18,6 +18,7 @@ import Boxscore from './Boxscore/Boxscore';
 import Plays from './Plays/Plays';
 import Feed from './Feed/Feed';
 import {getTeamImage} from '../../utils/helper';
+import Twitter from './Twitter/Twitter';
 const headerHeight = 80;
 
 export default class GameDetails extends Component {
@@ -72,7 +73,6 @@ export default class GameDetails extends Component {
     const transform = [{translateY}];
     const homeTeamImage = getTeamImage(params.hTeam.triCode);
     const awayTeamImage = getTeamImage(params.vTeam.triCode);
-    reactotron.log(params);
     return {
       headerTitle: (
         <Animated.View
@@ -103,6 +103,7 @@ export default class GameDetails extends Component {
                 {params.vTeam.triCode}
                 {'  '}
                 {params.vTeam.score} - {params.hTeam.score}
+                {params.playoffs && params.playoffs.seriesTextSummary}
                 {'  '}
                 {params.hTeam.triCode}
               </AnimatedText>
@@ -140,7 +141,6 @@ export default class GameDetails extends Component {
   };
 
   handleChangeTab = ({i, ref}) => {
-    reactotron.log(this.scrollPos);
     if (i === 0 && this.scrollPos < headerHeight / 2) {
       this.hideScore();
     } else {
@@ -198,6 +198,7 @@ export default class GameDetails extends Component {
             tabLabel="BOXSCORE"
           />
           <Plays gameDetails={this.state.gameDetails} tabLabel="PLAYS" />
+          <Twitter gameDetails={this.state.gameDetails} tabLabel="FEED" />
           <Feed gameDetails={this.state.gameDetails} tabLabel="HIGHLIGHTS" />
         </ScrollableTabView>
       </View>

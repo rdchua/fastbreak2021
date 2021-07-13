@@ -132,8 +132,8 @@ android {
         applicationId "com.fastbreak.nba"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 61
-        versionName "1.1"
+        versionCode 74
+        versionName "2"
     }
     splits {
         abi {
@@ -191,6 +191,7 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.facebook.react:react-native:+"  // From node_modules
+    implementation project(':lottie-react-native')
     // Firebase dependencies
     implementation "com.google.firebase:firebase-messaging:18.0.0"
     implementation "com.google.firebase:firebase-ads:17.2.1"

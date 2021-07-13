@@ -1,5 +1,12 @@
 import React, {Component} from 'react';
-import {View, ScrollView, FlatList, Image, Linking} from 'react-native';
+import {
+  View,
+  ScrollView,
+  FlatList,
+  Image,
+  Linking,
+  TouchableOpacity,
+} from 'react-native';
 import {styles} from './News.styles';
 import {getNews1, clutchpoints, getPlayerNews} from '../../api/news';
 import {getVideos, getUserVideos} from '../../api/youtube';
@@ -18,9 +25,8 @@ import Video2 from '../../components/Video2/Video2';
 import Modal from 'react-native-modal';
 import {sortBy} from 'underscore';
 import moment from 'moment';
-import firebase from 'react-native-firebase';
-import {TouchableOpacity} from 'react-native-gesture-handler';
 import SkeletonContent from 'react-native-skeleton-content-nonexpo';
+import {validatePurchase} from '../../utils/helper';
 const gradient = [
   'transparent',
   'rgba(18, 19, 20, 0.3)',
@@ -146,7 +152,28 @@ export default class News extends Component {
   };
 
   renderRotowireItem = ({item, index}) => {
-    return <Rotowire player={item} />;
+    let article = {
+      title: item.Headline,
+      date: moment(item.ListItemPubDate, 'MM/DD/YYYY hh:mm:ss a').format(
+        'dddd, MMM DD YYYY hh:mm a',
+      ),
+      caption: item.ListItemCaption,
+      description: item.ListItemDescription,
+      injured: item.Injured,
+      injuryStatus: item.Injured_Status,
+      rotowire: true,
+      author: 'Rotowire',
+      authorTitle: '',
+    };
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          this.setState({modalVisible: false});
+          this.props.navigation.navigate('Article', article);
+        }}>
+        <Rotowire player={item} />
+      </TouchableOpacity>
+    );
   };
 
   renderOtherNews = ({item, index}) => {
@@ -301,23 +328,8 @@ export default class News extends Component {
   }
 
   openNews(article) {
-    this.showAd();
+    validatePurchase();
     Linking.openURL(article.source);
-  }
-
-  showAd() {
-    const advert = firebase
-      .admob()
-      .interstitial('ca-app-pub-1108597602432224/5355417587');
-    const AdRequest = firebase.admob.AdRequest;
-    const request = new AdRequest();
-    request.addKeyword('foo').addKeyword('bar');
-    advert.loadAd(request.build());
-    advert.on('onAdLoaded', () => {
-      if (advert.isLoaded()) {
-        advert.show();
-      }
-    });
   }
 
   renderHero = () => {
@@ -379,7 +391,6 @@ export default class News extends Component {
           {this.renderHero()}
           {this.renderArticles()}
           <Card
-            style={{height: 427.714}}
             handleMore={() =>
               this.setState({
                 modalContent: 'players',

@@ -15,6 +15,7 @@ export const styles = StyleSheet.create({
   },
   scoreContainer: {
     marginTop: -10,
+    marginVertical: -5,
     marginHorizontal: -5,
     backgroundColor: theme.cardBackground,
     padding: 16,
@@ -74,5 +75,9 @@ export const styles = StyleSheet.create({
   headerTitle: {
     color: theme.textPrimary,
     fontSize: 17,
+  },
+  seriesText: {
+    marginTop: 20,
+    color: theme.textSecondary,
   },
 });

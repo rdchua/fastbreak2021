@@ -2,6 +2,8 @@ import teams from './../data/teams.json';
 import reactotron from 'reactotron-react-native';
 import statcategories from './../data/statCategories.json';
 import moment from 'moment';
+import firebase from 'react-native-firebase';
+import RNIap from 'react-native-iap';
 
 export const getTeamImage = teamTriCode => {
   let source;
@@ -262,3 +264,39 @@ export const getTime = game => {
       : 'FINAL';
   }
 };
+
+export const validatePurchase = adType => {
+  reactotron.log(adType);
+  RNIap.getAvailablePurchases().then(purchases => {
+    reactotron.log(purchases);
+    const purchasedProduct = purchases.find(purchase => {
+      return (
+        purchase.productId === 'fastbreak.supportme250' ||
+        purchase.productId === 'fastbreak.supportme500'
+      );
+    });
+    reactotron.log(purchasedProduct);
+    if (!purchasedProduct) {
+      showAd(adType);
+    }
+  });
+};
+
+function showAd(adType) {
+  const ad =
+    adType === 'Game Details'
+      ? 'ca-app-pub-6010622074415721/9800455550'
+      : 'ca-app-pub-6010622074415721/6599577140';
+  const advert = firebase.admob().interstitial(ad);
+  // .interstitial('ca-app-pub-1108597602432224/5355417587'); for news
+  // .interstitial('ca-app-pub-1108597602432224/5782605644'); for game details
+  const AdRequest = firebase.admob.AdRequest;
+  const request = new AdRequest();
+  request.addKeyword('foo').addKeyword('bar');
+  advert.loadAd(request.build());
+  advert.on('onAdLoaded', () => {
+    if (advert.isLoaded()) {
+      advert.show();
+    }
+  });
+}

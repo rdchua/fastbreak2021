@@ -19,6 +19,7 @@ export default class GameLeader extends PureComponent {
 
   render() {
     const {player} = this.props;
+    reactotron.log(player);
     const playerTeam = getTeamDetails(player.teamId);
     const teamImage = getTeamImage(playerTeam.triCode);
     return (
@@ -48,7 +49,10 @@ export default class GameLeader extends PureComponent {
               - {playerTeam.triCode}
             </AnimatedText>
           </AnimatedText>
-          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+          <ScrollView
+            contentContainerStyle={styles.statsContentContainer}
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}>
             <View>
               <AnimatedText style={[styles.statName, MIN_WIDTH]}>
                 PTS
@@ -153,9 +157,7 @@ export default class GameLeader extends PureComponent {
               <AnimatedText style={[styles.statName, MIN_WIDTH]}>
                 OREB
               </AnimatedText>
-              <AnimatedText
-                weight={500}
-                style={[styles.statVal, PERCENT_WIDTH]}>
+              <AnimatedText weight={500} style={[styles.statVal, MIN_WIDTH]}>
                 {player.offReb}
               </AnimatedText>
             </View>
@@ -163,19 +165,23 @@ export default class GameLeader extends PureComponent {
               <AnimatedText style={[styles.statName, MIN_WIDTH]}>
                 DREB
               </AnimatedText>
-              <AnimatedText
-                weight={500}
-                style={[styles.statVal, PERCENT_WIDTH]}>
+              <AnimatedText weight={500} style={[styles.statVal, MIN_WIDTH]}>
                 {player.defReb}
+              </AnimatedText>
+            </View>
+            <View>
+              <AnimatedText style={[styles.statName, MIN_WIDTH]}>
+                PF
+              </AnimatedText>
+              <AnimatedText weight={500} style={[styles.statVal, MIN_WIDTH]}>
+                {player.pFouls}
               </AnimatedText>
             </View>
             <View>
               <AnimatedText style={[styles.statName, MIN_WIDTH]}>
                 TO
               </AnimatedText>
-              <AnimatedText
-                weight={500}
-                style={[styles.statVal, PERCENT_WIDTH]}>
+              <AnimatedText weight={500} style={[styles.statVal, MIN_WIDTH]}>
                 {player.turnovers}
               </AnimatedText>
             </View>
@@ -183,7 +189,7 @@ export default class GameLeader extends PureComponent {
               <AnimatedText style={[styles.statName, MIN_WIDTH]}>
                 +/-
               </AnimatedText>
-              <AnimatedText weight={500} style={[styles.statVal, NORMAL_WIDTH]}>
+              <AnimatedText weight={500} style={[styles.statVal, MIN_WIDTH]}>
                 {player.plusMinus}
               </AnimatedText>
             </View>

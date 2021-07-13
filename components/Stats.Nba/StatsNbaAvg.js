@@ -9,56 +9,56 @@ const PERCENT_WIDTH = {width: 65 * fontScale};
 
 export default class StatsNbaAvg extends PureComponent {
   render() {
-    const {stats} = this.props;
+    const {stats, title} = this.props;
     return (
       <View style={styles.row}>
         <AnimatedText style={[styles.stat, styles.title]}>
-          {stats[1]}
+          {title}-{parseInt(title) + 1}
         </AnimatedText>
         <AnimatedText style={[styles.stat, NORMAL_WIDTH]}>
-          {stats[9]}
+          {stats.mpg}
         </AnimatedText>
         <AnimatedText style={[styles.stat, NORMAL_WIDTH]}>
-          {stats[29]}
+          {stats.ppg}
         </AnimatedText>
         <AnimatedText style={[styles.stat, NORMAL_WIDTH]}>
-          {stats[21]}
+          {stats.rpg}
         </AnimatedText>
         <AnimatedText style={[styles.stat, NORMAL_WIDTH]}>
-          {stats[22]}
+          {stats.apg}
         </AnimatedText>
         <AnimatedText style={[styles.stat, NORMAL_WIDTH]}>
-          {stats[24]}
+          {stats.spg}
         </AnimatedText>
         <AnimatedText style={[styles.stat, NORMAL_WIDTH]}>
-          {stats[25]}
+          {stats.bpg}
         </AnimatedText>
         <AnimatedText style={[styles.stat, PERCENT_WIDTH]}>
-          {stats[10]}/{stats[11]}
+          {stats.fgm}/{stats.fga}
         </AnimatedText>
         <AnimatedText style={[styles.stat, PERCENT_WIDTH]}>
-          {(stats[12] * 100).toFixed(1)}%
+          {stats.fgp}%
         </AnimatedText>
         <AnimatedText style={[styles.stat, PERCENT_WIDTH]}>
-          {stats[13]}/{stats[14]}
+          {stats.tpm}/{stats.tpa}
         </AnimatedText>
         <AnimatedText style={[styles.stat, PERCENT_WIDTH]}>
-          {(stats[15] * 100).toFixed(1)}%
+          {((stats.tpm / stats.tpa) * 100).toFixed(1)}%
         </AnimatedText>
         <AnimatedText style={[styles.stat, PERCENT_WIDTH]}>
-          {stats[16]}/{stats[17]}
+          {stats.ftm}/{stats.fta}
         </AnimatedText>
         <AnimatedText style={[styles.stat, PERCENT_WIDTH]}>
-          {(stats[18] * 100).toFixed(1)}%
+          {((stats.ftm / stats.fta) * 100).toFixed(1)}%
         </AnimatedText>
         <AnimatedText style={[styles.stat, NORMAL_WIDTH]}>
-          {stats[19]}
+          {stats.offReb}
         </AnimatedText>
         <AnimatedText style={[styles.stat, NORMAL_WIDTH]}>
-          {stats[20]}
+          {stats.defReb}
         </AnimatedText>
         <AnimatedText style={[styles.stat, NORMAL_WIDTH]}>
-          {stats[23]}
+          {stats.topg}
         </AnimatedText>
       </View>
     );

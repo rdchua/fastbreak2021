@@ -4,6 +4,7 @@ import * as Animatable from 'react-native-animatable';
 import {styles} from './Headline.styles';
 import firebase from 'react-native-firebase';
 import AnimatedText from '../AnimatedText/AnimatedText';
+import {validatePurchase} from '../../utils/helper';
 
 export default class Headline extends Component {
   constructor(props) {
@@ -11,23 +12,8 @@ export default class Headline extends Component {
   }
 
   openNews(article) {
-    this.showAd();
+    validatePurchase();
     Linking.openURL(article.source);
-  }
-
-  showAd() {
-    const advert = firebase
-      .admob()
-      .interstitial('ca-app-pub-1108597602432224/5355417587');
-    const AdRequest = firebase.admob.AdRequest;
-    const request = new AdRequest();
-    request.addKeyword('foo').addKeyword('bar');
-    advert.loadAd(request.build());
-    advert.on('onAdLoaded', () => {
-      if (advert.isLoaded()) {
-        advert.show();
-      }
-    });
   }
 
   render() {

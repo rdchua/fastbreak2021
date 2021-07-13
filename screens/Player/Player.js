@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {Component} from 'react';
+import React, {Component} from 'reactn';
 import {
   View,
   ScrollView,
@@ -9,15 +9,15 @@ import {
   Linking,
   Alert,
   Animated,
+  TouchableOpacity,
 } from 'react-native';
 import {styles} from './Player.styles';
-import {getTeamDetails, getTeamImage} from '../../utils/helper';
+import {getTeamDetails, validatePurchase} from '../../utils/helper';
 import {headshot} from '../../api/data.nba';
-import {getGameLog, getSeasonAvg, getFantasyNews} from '../../api/stats.nba';
-import {getPlayers} from '../../api/data.nba';
+import {getGameLog, getFantasyNews} from '../../api/stats.nba';
+import {getPlayers, getPlayerProfile} from '../../api/data.nba';
 import reactotron from 'reactotron-react-native';
 import AnimatedText from '../../components/AnimatedText/AnimatedText';
-import Loading from '../../components/Loading/Loading';
 import * as theme from '../../Theme';
 import StatsNba from '../../components/Stats.Nba/Stats.nba';
 import StatsNbaHeader from '../../components/Stats.Nba/StatsNbaHeader';
@@ -52,6 +52,7 @@ export default class Player extends Component {
   }
 
   componentDidMount() {
+    validatePurchase('Game Details');
     this.fetchGameLog();
     this.fetchSeasonAvg();
     this.fetchNews();
@@ -132,12 +133,19 @@ export default class Player extends Component {
 
   fetchSeasonAvg() {
     const {player} = this.state;
-    getSeasonAvg(player.personId).then(response => {
+    getPlayerProfile(this.global.seasonYear, player.personId).then(response => {
+      reactotron.log(response.data.league.standard.stats);
       this.setState({
-        seasonAvgs: response.data.resultSets[1].rowSet,
+        seasonAvgs: response.data.league.standard.stats.regularSeason.season,
         avgLoading: false,
       });
     });
+    // getSeasonAvg(player.personId).then(response => {
+    //   this.setState({
+    //     seasonAvgs: response.data.resultSets[1].rowSet,
+    //     avgLoading: false,
+    //   });
+    // });
   }
 
   fetchNews() {
@@ -152,7 +160,7 @@ export default class Player extends Component {
 
   fetchProfile() {
     const {player} = this.state;
-    getPlayers().then(response => {
+    getPlayers(this.global.seasonYear).then(response => {
       const players = response.data.league.standard;
       const profile = players.find(person => {
         return person.personId === player.personId;
@@ -166,17 +174,30 @@ export default class Player extends Component {
   };
 
   renderSeasonAvg = ({item, index}) => {
-    return <StatsNbaAvg stats={item} />;
+    return <StatsNbaAvg title={item.seasonYear} stats={item.total} />;
   };
 
   renderNewsItem = ({item, index}) => {
+    reactotron.log(item);
+    let article = {
+      title: item.Headline,
+      date: moment(item.ListItemPubDate, 'MM/DD/YYYY hh:mm:ss a').format(
+        'dddd, MMM DD YYYY hh:mm a',
+      ),
+      caption: item.ListItemCaption,
+      description: item.ListItemDescription,
+      injured: item.Injured,
+      injuryStatus: item.Injured_Status,
+      rotowire: true,
+      author: 'Rotowire',
+      authorTitle: '',
+    };
     return (
-      <View style={{paddingTop: index !== 0 ? 10 : 0, paddingBottom: 10}}>
-        <NewsText
-          title={item.ListItemCaption}
-          body={item.ListItemDescription}
-        />
-      </View>
+      <TouchableOpacity
+        onPress={() => this.props.navigation.navigate('Article', article)}
+        style={{paddingTop: index !== 0 ? 10 : 0, paddingBottom: 10}}>
+        <NewsText icon title={item.Headline} body={item.ListItemCaption} />
+      </TouchableOpacity>
     );
   };
 
@@ -198,7 +219,7 @@ export default class Player extends Component {
       return (
         <FlatList
           ItemSeparatorComponent={() => <ItemSeparator />}
-          data={news.slice(0, 3)}
+          data={news.slice(0, 6)}
           keyExtractor={(item, index) => index.toString()}
           renderItem={this.renderNewsItem}
         />
@@ -318,7 +339,9 @@ export default class Player extends Component {
           Alert.alert('We found no apps that can open this video');
         } else {
           return Linking.openURL(
-            `https://stats.nba.com/player/${player.personId}/boxscores-advanced/`,
+            `https://stats.nba.com/player/${
+              player.personId
+            }/boxscores-advanced/`,
           );
         }
       })
@@ -361,7 +384,7 @@ export default class Player extends Component {
           data={seasonAvgs.slice(0, 3)}
           ItemSeparatorComponent={() => <ItemSeparator />}
           ListHeaderComponent={<StatsNbaHeader title="Regular Season" />}
-          keyExtractor={item => item[2]}
+          keyExtractor={item => item.seasonYear}
           renderItem={this.renderSeasonAvg}
         />
       </ScrollView>
@@ -397,6 +420,17 @@ export default class Player extends Component {
     );
   };
 
+  renderInjury() {
+    const {news, newsLoading} = this.state;
+    if (newsLoading || !news[0]) {
+      return '';
+    } else if (news[0].Injured === 'YES' && news[0].Injured) {
+      return ` ${news[0].Injured_Status}`;
+    } else {
+      return ``;
+    }
+  }
+
   render() {
     const {player, logs, myTeamButtonActive} = this.state;
     const scrollOpacity = this.scrollY.interpolate({
@@ -431,6 +465,9 @@ export default class Player extends Component {
             <View style={styles.info}>
               <AnimatedText weight={600} style={styles.name}>
                 {player.firstName} {player.lastName}
+                <AnimatedText style={styles.injury}>
+                  {this.renderInjury()}
+                </AnimatedText>
               </AnimatedText>
               <AnimatedText style={styles.teamName}>
                 {team.altCityName} {team.nickName}
@@ -465,9 +502,7 @@ export default class Player extends Component {
           {this.renderAverage()}
           {this.renderLogs()}
         </Card>
-        <Card
-          titleStyle={{marginTop: 5}}
-          style={{marginTop: 5, height: 535.142}}>
+        <Card titleStyle={{marginTop: 5}} style={{marginTop: 5}}>
           {this.renderNews()}
         </Card>
         <Modal

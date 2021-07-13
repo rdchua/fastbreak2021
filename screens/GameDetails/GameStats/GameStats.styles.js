@@ -18,7 +18,7 @@ export const styles = StyleSheet.create({
     marginHorizontal: -5,
     backgroundColor: theme.cardBackground,
     padding: 16,
-    marginBottom: 2.5,
+    marginBottom: 3,
   },
   teamImage: {
     height: 70,
@@ -70,5 +70,33 @@ export const styles = StyleSheet.create({
   },
   teamStatsContainer: {
     marginTop: 10,
+  },
+  teamQuarterName: {
+    width: 100,
+    color: theme.textPrimary,
+    fontSize: 15,
+    alignSelf: 'center',
+  },
+  teamQuarterImage: {
+    width: 25,
+    height: 25,
+    marginRight: 10,
+    alignSelf: 'center',
+  },
+  quarterHeader: {
+    color: theme.textPrimary,
+    flex: 1,
+    textAlign: 'center',
+  },
+  quarterScores: {
+    color: theme.textPrimary,
+    flex: 1,
+    textAlign: 'center',
+    alignSelf: 'center',
+  },
+  seriesSummary: {
+    color: theme.textSecondary,
+    textAlign: 'center',
+    top: -40,
   },
 });

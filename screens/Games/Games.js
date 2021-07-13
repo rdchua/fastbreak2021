@@ -17,8 +17,8 @@ import {ScrollView} from 'react-native-gesture-handler';
 import Empty from '../../components/Empty/Empty';
 import ItemSeparator from '../../components/ItemSeparator';
 import {sortBy} from 'underscore';
-import firebase from 'react-native-firebase';
 import Store from 'react-native-simple-store';
+import {validatePurchase} from '../../utils/helper';
 const dateFormat = 'YYYYMMDD';
 
 export default class Games extends Component {
@@ -119,27 +119,12 @@ export default class Games extends Component {
   };
 
   handleGamePress(game) {
-    this.showAd();
+    validatePurchase('Game Details');
     if (game.statusNum === 1) {
       this.props.navigation.navigate('PreGame', game);
     } else {
       this.props.navigation.navigate('GameDetails', game);
     }
-  }
-
-  showAd() {
-    const advert = firebase
-      .admob()
-      .interstitial('ca-app-pub-1108597602432224/5782605644');
-    const AdRequest = firebase.admob.AdRequest;
-    const request = new AdRequest();
-    request.addKeyword('foo').addKeyword('bar');
-    advert.loadAd(request.build());
-    advert.on('onAdLoaded', () => {
-      if (advert.isLoaded()) {
-        advert.show();
-      }
-    });
   }
 
   onRefresh() {

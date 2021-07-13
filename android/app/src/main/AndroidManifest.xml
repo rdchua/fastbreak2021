@@ -4,6 +4,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="com.android.vending.BILLING" />
 
     <application
       android:name=".MainApplication"
@@ -20,7 +21,7 @@
         android:resource="@mipmap/ic_notification"/>
       <meta-data
         android:name="com.google.android.gms.ads.APPLICATION_ID"
-        android:value="ca-app-pub-1108597602432224~7291128436"/>
+        android:value="ca-app-pub-6010622074415721~4742434529"/>
       <uses-library android:name="org.apache.http.legacy" android:required="false"/>
       <activity
         android:name=".MainActivity"

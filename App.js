@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'reactn';
 import {createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
 import Tabs from './screens/Tabs/Tabs';
@@ -14,9 +14,30 @@ import {fromRight} from 'react-navigation-transitions';
 import PreGame from './screens/PreGame/PreGame';
 import firebase from 'react-native-firebase';
 import reactotron from 'reactotron-react-native';
+import Store from 'react-native-simple-store';
+import {twitterAuth} from './api/twitter';
+import Article from './screens/Article/Article';
+import {getGeneralDetails} from './api/data.nba';
+import * as theme from './Theme';
+import Loading from './components/Loading/Loading';
+import Preloader from './components/Preloader/Preloader';
 
 export default class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      loading: true,
+    };
+  }
+
+  oAuthTwitter() {
+    twitterAuth.then(data => {
+      Store.update('twitterToken', data.access_token);
+    });
+  }
+
   async componentDidMount() {
+    this.oAuthTwitter();
     const enabled = await firebase.messaging().hasPermission();
     if (enabled) {
       const channel = new firebase.notifications.Android.Channel(
@@ -58,6 +79,12 @@ export default class App extends React.Component {
     } else {
       reactotron.log('Messaging is still disabled');
     }
+    getGeneralDetails().then(({data}) => {
+      this.setGlobal({
+        seasonYear: data.seasonScheduleYear,
+      });
+      this.setState({loading: false});
+    });
   }
 
   componentWillUnmount() {
@@ -66,6 +93,9 @@ export default class App extends React.Component {
   }
 
   render() {
+    if (this.state.loading) {
+      return <Preloader />;
+    }
     return <Fastbreak />;
   }
 }
@@ -92,6 +122,9 @@ const MainNavigator = createStackNavigator(
     },
     Calendar: {
       screen: Calendar,
+    },
+    Article: {
+      screen: Article,
     },
     Search: {
       screen: Search,

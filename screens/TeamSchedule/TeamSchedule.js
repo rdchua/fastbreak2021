@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component} from 'reactn';
 import {
   View,
   ScrollView,
@@ -13,9 +13,12 @@ import Loading from '../../components/Loading/Loading';
 import {darkBackground, cardBackground} from '../../Theme';
 import AnimatedText from '../../components/AnimatedText/AnimatedText';
 import moment from 'moment-timezone';
-import {getTeamImage, getTeamDetails} from '../../utils/helper';
+import {
+  getTeamImage,
+  getTeamDetails,
+  validatePurchase,
+} from '../../utils/helper';
 import {sortBy} from 'underscore';
-import firebase from 'react-native-firebase';
 export default class TeamSchedule extends Component {
   constructor(props) {
     super(props);
@@ -50,7 +53,7 @@ export default class TeamSchedule extends Component {
 
   getSchedule() {
     const {team} = this.state;
-    getTeamSchedule(team.urlName).then(response => {
+    getTeamSchedule(this.global.seasonYear, team.urlName).then(response => {
       reactotron.log(response);
       this.setState({
         loading: false,
@@ -118,27 +121,12 @@ export default class TeamSchedule extends Component {
   };
 
   handleGamePress(game) {
-    this.showAd();
+    validatePurchase('Game Details');
     if (game.statusNum === 1) {
       this.props.navigation.navigate('PreGame', game);
     } else {
       this.props.navigation.navigate('GameDetails', game);
     }
-  }
-
-  showAd() {
-    const advert = firebase
-      .admob()
-      .interstitial('ca-app-pub-1108597602432224/5782605644');
-    const AdRequest = firebase.admob.AdRequest;
-    const request = new AdRequest();
-    request.addKeyword('foo').addKeyword('bar');
-    advert.loadAd(request.build());
-    advert.on('onAdLoaded', () => {
-      if (advert.isLoaded()) {
-        advert.show();
-      }
-    });
   }
 
   render() {

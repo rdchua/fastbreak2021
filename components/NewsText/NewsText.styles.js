@@ -6,9 +6,11 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   articleTitle: {
+    flex: 1,
     color: theme.textPrimary,
     fontSize: 17,
-    marginBottom: 10,
+    marginBottom: 5,
+    paddingRight: 10,
   },
   articleBody: {
     color: theme.textSecondary,
@@ -17,5 +19,12 @@ export const styles = StyleSheet.create({
   empty: {
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  row: {
+    flexDirection: 'row',
+  },
+  icon: {
+    alignSelf: 'center',
+    marginRight: 5,
   },
 });

@@ -112,11 +112,9 @@ export default class Game extends Component {
       } else if (game.period.isEndOfPeriod) {
         return (
           // eslint-disable-next-line prettier/prettier
-          <AnimatedText
-            weight={500}
-            style={
-              styles.live
-            }>{`END OF Q${game.period.current}`}</AnimatedText>
+          <AnimatedText weight={500} style={styles.live}>{`END OF Q${
+            game.period.current
+          }`}</AnimatedText>
         );
       }
       return (
@@ -141,7 +139,7 @@ export default class Game extends Component {
     const {game} = this.props;
     return game.watch.broadcast.broadcasters.national.length > 0
       ? game.watch.broadcast.broadcasters.national[0].shortName
-      : game.watch.broadcast.broadcasters.hTeam[0].longName;
+      : 'N/A';
   };
 
   navigateToGameDetails() {
@@ -256,6 +254,10 @@ export default class Game extends Component {
           game.nugget.text !== 'Watch with NBA League Pass Free Preview' ? (
             <AnimatedText italic={true} style={styles.nugget}>
               {game.nugget.text}
+            </AnimatedText>
+          ) : game.playoffs && game.playoffs.seriesSummaryText !== '' ? (
+            <AnimatedText italic={true} style={styles.nugget}>
+              {game.playoffs.seriesSummaryText}
             </AnimatedText>
           ) : null}
         </View>

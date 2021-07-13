@@ -32,16 +32,16 @@ export const getSchedule = teamUrlName => {
   return axios.get(`${base}/v1/2019/teams/${teamUrlName}/schedule.json`);
 };
 
-export const getPlayerProfile = personId => {
-  return axios.get(`${base}/v1/2019/players/${personId}_profile.json`);
+export const getPlayerProfile = (year, personId) => {
+  return axios.get(`${base}/v1/${year}/players/${personId}_profile.json`);
 };
 
-export const getPlayers = () => {
-  return axios.get(`${base}/v1/2019/players.json`);
+export const getPlayers = year => {
+  return axios.get(`${base}/v1/${year}/players.json`);
 };
 
-export const getTeamLeaders = teamUrlCode => {
-  return axios.get(`${base}/v1/2019/teams/${teamUrlCode}/leaders.json`);
+export const getTeamLeaders = (year, teamUrlCode) => {
+  return axios.get(`${base}/v1/${year}/teams/${teamUrlCode}/leaders.json`);
 };
 
 export const getConferenceStandings = () => {
@@ -56,12 +56,12 @@ export const getOverallStandings = () => {
   return axios.get(`${base}/v1/current/standings_all.json`);
 };
 
-export const getRoster = urlName => {
-  return axios.get(`${base}/v1/2019/teams/${urlName}/roster.json`);
+export const getRoster = (year, urlName) => {
+  return axios.get(`${base}/v1/${year}/teams/${urlName}/roster.json`);
 };
 
-export const getTeamSchedule = urlName => {
-  return axios.get(`${base}/v1/2019/teams/${urlName}/schedule.json`);
+export const getTeamSchedule = (year, urlName) => {
+  return axios.get(`${base}/v1/${year}/teams/${urlName}/schedule.json`);
 };
 
 export const headshot = personId => {
@@ -71,4 +71,12 @@ export const headshot = personId => {
    * This is an alternate link for player headshots. Just replace the last number to the persion ID
    * of the player. This links is what the official NBA website uses for their images.
    */
+};
+
+export const getPlayoffBracket = year => {
+  return axios(`${base}/v1/${year}/playoffsBracket.json`);
+};
+
+export const getGeneralDetails = () => {
+  return axios(`${base}/v2/today.json`);
 };

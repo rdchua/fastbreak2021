@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component} from 'reactn';
 import {
   View,
   ScrollView,
@@ -44,6 +44,7 @@ import SkeletonContent from 'react-native-skeleton-content-nonexpo';
 export default class PreGame extends Component {
   constructor(props) {
     super(props);
+    reactotron.log(this.props.navigation.state.params);
     this.state = {
       game: this.props.navigation.state.params,
       prevMatchupLoading: true,
@@ -61,7 +62,7 @@ export default class PreGame extends Component {
   }
 
   fetchPlayers() {
-    getPlayers().then(response => {
+    getPlayers(this.global.seasonYear).then(response => {
       reactotron.log(response);
       this.setState({
         players: response.data.league.standard,
@@ -91,8 +92,8 @@ export default class PreGame extends Component {
     const homeTeam = getTeamDetails(game.hTeam.teamId);
     const awayTeam = getTeamDetails(game.vTeam.teamId);
     Promise.all([
-      getTeamLeaders(homeTeam.urlName),
-      getTeamLeaders(awayTeam.urlName),
+      getTeamLeaders(this.global.seasonYear, homeTeam.urlName),
+      getTeamLeaders(this.global.seasonYear, awayTeam.urlName),
     ]).then(response => {
       reactotron.log(response[0].data.league.standard);
       this.setState({
@@ -162,6 +163,10 @@ export default class PreGame extends Component {
 
   renderGameClock = () => {
     const {game} = this.state;
+    reactotron.display({
+      name: 'game',
+      value: game,
+    });
     const startTime = moment(game.startTimeUTC).format('hh:mm');
     const startTimeA = moment(game.startTimeUTC).format('A');
     const startDate = moment(game.startTimeUTC).format('MMM DD, YYYY');
@@ -172,6 +177,11 @@ export default class PreGame extends Component {
           <AnimatedText style={styles.startTimeA}>{startTimeA}</AnimatedText>
         </AnimatedText>
         <AnimatedText style={styles.date}>{startDate}</AnimatedText>
+        {game.playoffs ? (
+          <AnimatedText style={styles.seriesText}>
+            {game.playoffs.seriesSummaryText}
+          </AnimatedText>
+        ) : null}
       </View>
     );
   };
@@ -410,7 +420,9 @@ export default class PreGame extends Component {
     const homeTeamScore = game.hTeam.score;
     const awayTeamScore = game.vTeam.score;
     return (
-      <ScrollView style={styles.container}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}>
         <StatusBar backgroundColor={cardBackground} />
         <View style={[styles.row, styles.scoreContainer]}>
           <TouchableOpacity
@@ -425,9 +437,9 @@ export default class PreGame extends Component {
             </AnimatedText>
           </TouchableOpacity>
           <View style={[styles.row, styles.scoreboard]}>
-            <AnimatedText style={styles.teamScore}></AnimatedText>
+            <AnimatedText style={styles.teamScore} />
             {this.renderGameClock()}
-            <AnimatedText style={styles.teamScore}></AnimatedText>
+            <AnimatedText style={styles.teamScore} />
           </View>
           <TouchableOpacity
             onPress={() => this.handleTeamPress(homeTeam)}

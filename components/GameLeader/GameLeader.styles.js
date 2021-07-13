@@ -14,6 +14,7 @@ export const styles = StyleSheet.create({
   },
   stats: {
     marginLeft: 15,
+    flex: 1,
   },
   statName: {
     fontSize: 12,
@@ -46,5 +47,9 @@ export const styles = StyleSheet.create({
   teamContainer: {
     alignSelf: 'center',
     marginRight: 5,
+  },
+  statsContentContainer: {
+    borderWidth: 3,
+    borderColor: 'red',
   },
 });

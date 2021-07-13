@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import axios from 'axios';
 import reactotron from 'reactotron-react-native';
+import moment from 'moment';
 const base = 'https://stats.nba.com/stats';
 const season = '2019-20';
 
@@ -16,7 +17,9 @@ export const headers = {
       'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
     'Accept-Encoding': 'gzip, deflate, br',
     'Accept-Language': 'en-US,en;q=0.9',
-    Referer: 'https://stats.nba.com/', //will not work without this header
+    Referer: 'https://stats.nba.com', //will not work without this header,
+    'x-nba-stats-origin': 'stats',
+    'x-nba-stats-token': 'true',
   },
 };
 
@@ -56,5 +59,11 @@ export const getStatLeader = (category, mode) => {
   return axios.get(
     `https://stats.nba.com/stats/leagueLeaders?LeagueID=00&PerMode=${mode}&Scope=S&Season=2019-20&SeasonType=Regular+Season&StatCategory=${category}`,
     headers,
+  );
+};
+
+export const getPlayoffBracket = year => {
+  return axios.get(
+    `https://stats.nba.com/stats/playoffbracket?LeagueID=00&SeasonYear=${year}&State=2`,
   );
 };

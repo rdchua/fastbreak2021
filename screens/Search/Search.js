@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component} from 'reactn';
 import {
   FlatList,
   View,
@@ -35,7 +35,7 @@ export default class Search extends Component {
   }
 
   fetchPlayers() {
-    getPlayers().then(response => {
+    getPlayers(this.global.seasonYear).then(response => {
       reactotron.log(response.data);
       this.setState({
         players: response.data.league.standard.concat(teams),

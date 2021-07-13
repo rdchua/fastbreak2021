@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {Component} from 'react';
+import React, {Component} from 'reactn';
 import {
   View,
   ScrollView,
@@ -119,7 +119,7 @@ export default class FantasyTeam extends Component {
   }
 
   fetchPlayers() {
-    getPlayers().then(response => {
+    getPlayers(this.global.seasonYear).then(response => {
       this.setState({
         players: response.data.league.standard,
         playersLoading: false,

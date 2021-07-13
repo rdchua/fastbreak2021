@@ -9,6 +9,13 @@ export const headers = {
   },
 };
 
+export const headers2 = {
+  headers: {
+    Authorization:
+      'sBBqsGXiYgF0Db5OV5tAw-x0W6ysVPB1_iQbXZ06l3tgZBwSijbnllpRrG-qp2Mdn2pHZrSf1gT2PUujH1YaQA',
+  },
+};
+
 export const rssFeed = urlName => {
   return `https://api.rss2json.com/v1/api.json?rss_url=https://www.nba.com/${urlName}/rss.xml`;
 };
@@ -33,6 +40,13 @@ export const getNews1 = () => {
 export const getNews2 = () => {
   return axios(
     `https://wrapapi.com/use/rdchua30/fastbreak/nbanews/0.0.4?page=2&wrapAPIKey=7F9HjhAhwEYJKuPC2WhfCBTICMKnhIrd`,
+  );
+};
+
+export const getNews3 = () => {
+  return axios(
+    'https://api.newsriver.io/v2/search?query=text%3A%22nba%20basketball%22&sortBy=discoverDate&sortOrder=DESC&limit=30',
+    headers2,
   );
 };
 

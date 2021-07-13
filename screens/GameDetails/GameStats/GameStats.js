@@ -33,7 +33,9 @@ import {
   skeletonLeadersStyle,
   skeletonTeamStatsStyle,
   teamStatsSkeleton,
+  textPrimary,
 } from '../../../Theme';
+import Animated from 'react-native-reanimated';
 
 export default class GameStats extends Component {
   constructor(props) {
@@ -48,7 +50,6 @@ export default class GameStats extends Component {
   }
 
   componentDidMount() {
-    reactotron.log('moutning stats');
     this.getRecapArticle();
     this.getBoxscore();
     this.interval = setInterval(
@@ -91,7 +92,6 @@ export default class GameStats extends Component {
   }
 
   getBoxscore() {
-    reactotron.log('fetching game details');
     const {game} = this.state;
     getBoxscore(game.startDateEastern, game.gameId).then(response => {
       const players = response.data.stats.activePlayers;
@@ -166,10 +166,9 @@ export default class GameStats extends Component {
       } else if (game.period.isEndOfPeriod) {
         return (
           // eslint-disable-next-line prettier/prettier
-          <AnimatedText
-            style={
-              styles.gameClock
-            }>{`END OF Q${game.period.current}`}</AnimatedText>
+          <AnimatedText style={styles.gameClock}>{`END OF Q${
+            game.period.current
+          }`}</AnimatedText>
         );
       }
       return (
@@ -192,6 +191,22 @@ export default class GameStats extends Component {
     }
   };
 
+  openArticle(recapArticle) {
+    let body;
+    recapArticle.paragraphs.forEach(paragraph => {
+      body += `${paragraph.paragraph}\n\n`;
+    });
+    let article = {
+      title: recapArticle.title,
+      date: moment(recapArticle.pubDateUTC).format('dddd, MMM DD YYYY hh:mm a'),
+      caption: recapArticle.paragraphs[3].paragraph,
+      description: body.replace('undefined', ''),
+      author: recapArticle.author === '' ? 'NBA' : recapArticle.author,
+      authorTitle: recapArticle.authorTitle,
+    };
+    this.props.navigation.navigate('Article', article);
+  }
+
   renderRecapArticle = () => {
     const {recapArticle, recapLoading} = this.state;
     return (
@@ -202,10 +217,12 @@ export default class GameStats extends Component {
         highlightColor={skeletonHighlight}
         layout={newsTextSkeleton}>
         {recapArticle ? (
-          <NewsText
-            title={recapArticle.title}
-            body={recapArticle.paragraphs[3].paragraph}
-          />
+          <TouchableOpacity onPress={() => this.openArticle(recapArticle)}>
+            <NewsText
+              title={recapArticle.title}
+              body={recapArticle.paragraphs[3].paragraph}
+            />
+          </TouchableOpacity>
         ) : (
           <NewsText title="" body="No Article" />
         )}
@@ -405,8 +422,77 @@ export default class GameStats extends Component {
     }
   };
 
+  renderQuarterHeader = noOfQuarters => {
+    return noOfQuarters.map((score, index) => {
+      const quarter = index > 3 ? `OT ${(index % 4) + 1}` : `Q${index + 1}`;
+      return (
+        <AnimatedText style={styles.quarterHeader}>{quarter}</AnimatedText>
+      );
+    });
+  };
+
+  renderQuarterScores = noOfQuarters => {
+    return noOfQuarters.map((score, index) => {
+      return (
+        <AnimatedText style={styles.quarterScores}>{score.score}</AnimatedText>
+      );
+    });
+  };
+
+  renderLinesScore = (homeTeamImage, awayTeamImage, homeTeam, awayTeam) => {
+    const {game} = this.state;
+    const homeTeamLinescore = game.hTeam.linescore;
+    const awayTeamLinescore = game.vTeam.linescore;
+    return (
+      <View>
+        <View style={[styles.row, {marginBottom: 10}]}>
+          <AnimatedText
+            style={[
+              styles.row,
+              {width: 150, color: textPrimary, fontSize: 15},
+            ]}>
+            Team Name
+          </AnimatedText>
+          {this.renderQuarterHeader(awayTeamLinescore)}
+          <AnimatedText style={styles.quarterHeader}>T</AnimatedText>
+        </View>
+        <View style={styles.row}>
+          <View style={[styles.row, {width: 150}]}>
+            <Image style={styles.teamQuarterImage} source={awayTeamImage} />
+            <AnimatedText
+              numberOfLines={1}
+              weight={600}
+              style={styles.teamQuarterName}>
+              {awayTeam.triCode} {awayTeam.nickName}
+            </AnimatedText>
+          </View>
+          {this.renderQuarterScores(awayTeamLinescore)}
+          <AnimatedText style={styles.quarterScores}>
+            {game.vTeam.score}
+          </AnimatedText>
+        </View>
+        <View style={[styles.row, {marginTop: 5}]}>
+          <View style={[styles.row, {width: 150}]}>
+            <Image style={styles.teamQuarterImage} source={homeTeamImage} />
+            <AnimatedText
+              numberOfLines={1}
+              weight={600}
+              style={styles.teamQuarterName}>
+              {homeTeam.triCode} {homeTeam.nickName}
+            </AnimatedText>
+          </View>
+          {this.renderQuarterScores(homeTeamLinescore)}
+          <AnimatedText style={styles.quarterScores}>
+            {game.hTeam.score}
+          </AnimatedText>
+        </View>
+      </View>
+    );
+  };
+
   render() {
     const {game} = this.state;
+    reactotron.log(game);
     const homeTeamImage = getTeamImage(game.hTeam.triCode);
     const awayTeamImage = getTeamImage(game.vTeam.triCode);
     const homeTeam = getTeamDetails(game.hTeam.teamId);
@@ -440,14 +526,21 @@ export default class GameStats extends Component {
               ({awayTeamStanding})
             </AnimatedText>
           </TouchableOpacity>
-          <View style={[styles.row, styles.scoreboard]}>
-            <AnimatedText style={styles.teamScore}>
-              {awayTeamScore}
-            </AnimatedText>
-            {this.renderGameClock()}
-            <AnimatedText style={styles.teamScore}>
-              {homeTeamScore}
-            </AnimatedText>
+          <View>
+            <View style={[styles.row, styles.scoreboard]}>
+              <AnimatedText style={styles.teamScore}>
+                {awayTeamScore}
+              </AnimatedText>
+              {this.renderGameClock()}
+              <AnimatedText style={styles.teamScore}>
+                {homeTeamScore}
+              </AnimatedText>
+            </View>
+            {game.playoffs ? (
+              <AnimatedText style={styles.seriesSummary}>
+                {game.playoffs && game.playoffs.seriesSummaryText}
+              </AnimatedText>
+            ) : null}
           </View>
           <TouchableOpacity
             onPress={() => this.handleTeamPress(homeTeam)}
@@ -461,6 +554,14 @@ export default class GameStats extends Component {
             </AnimatedText>
           </TouchableOpacity>
         </View>
+        <Card>
+          {this.renderLinesScore(
+            homeTeamImage,
+            awayTeamImage,
+            homeTeam,
+            awayTeam,
+          )}
+        </Card>
         <Card>{this.renderRecapArticle()}</Card>
         <Card title="LEADERS" style={{height: 208.85}}>
           {this.renderLeaders()}

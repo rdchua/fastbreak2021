@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component} from 'reactn';
 import {
   View,
   ScrollView,
@@ -11,7 +11,11 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {styles} from './Team.styles';
-import {getTeamImage, getPlayerDetails} from '../../utils/helper';
+import {
+  getTeamImage,
+  getPlayerDetails,
+  validatePurchase,
+} from '../../utils/helper';
 import {getTeamLeaders, getPlayers, getRoster} from '../../api/data.nba';
 import {getTeamStats} from '../../api/stats.nba';
 import {getTeamNews} from '../../api/news';
@@ -49,6 +53,7 @@ export default class Team extends Component {
   }
 
   componentDidMount() {
+    validatePurchase('Game Details');
     this.fetchLeaders();
     this.fetchStats();
     this.fetchNews();
@@ -96,7 +101,7 @@ export default class Team extends Component {
 
   fetchRoster() {
     const {team} = this.state;
-    getRoster(team.urlName).then(response => {
+    getRoster(this.global.seasonYear, team.urlName).then(response => {
       this.setState({
         roster: response.data.league.standard.players,
         rosterLoading: false,
@@ -106,7 +111,10 @@ export default class Team extends Component {
 
   fetchLeaders() {
     const {team} = this.state;
-    Promise.all([getPlayers(), getTeamLeaders(team.urlName)]).then(response => {
+    Promise.all([
+      getPlayers(this.global.seasonYear),
+      getTeamLeaders(this.global.seasonYear, team.urlName),
+    ]).then(response => {
       const players = response[0].data.league.standard;
       const leaders = response[1].data.league.standard;
       const pointsLeader = {

@@ -111,4 +111,7 @@ export const styles = StyleSheet.create({
     fontSize: 22,
     color: 'white',
   },
+  injury: {
+    color: theme.red,
+  },
 });
